@@ -1,0 +1,176 @@
+{
+  "name": "AI Content Repurposing Agent",
+  "nodes": [
+    {
+      "parameters": {
+        "formTitle": "AI Content Repurposing Agent",
+        "formDescription": "Enter a blog URL to generate 7 social media content formats.",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "Blog URL",
+              "placeholder": "https://example.com/blog-post"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.6,
+      "position": [
+        0,
+        0
+      ],
+      "id": "255ad7df-bcf0-4ad0-8676-7bfb39d06990",
+      "name": "On form submission"
+    },
+    {
+      "parameters": {
+        "url": "=\t{{ $json['Blog URL'] }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.5,
+      "position": [
+        224,
+        0
+      ],
+      "id": "5c2101dc-1aec-4e52-84c8-25a5a581c15f",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "operation": "extractHtmlContent",
+        "extractionValues": {
+          "values": [
+            {
+              "key": "blogContent",
+              "cssSelector": "body"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.html",
+      "typeVersion": 1.2,
+      "position": [
+        448,
+        0
+      ],
+      "id": "800b01ca-ea97-4659-a26d-3767cdb48aeb",
+      "name": "HTML"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=\n{{ \n`You are an expert AI content repurposing assistant.\n\nYour task is to transform the supplied blog content into 7 social media content formats.\n\nFor EACH of the 7 formats, generate THREE distinct versions using these tones:\n\nTONE 1: PROFESSIONAL\n- Polished, informative and business-oriented.\n- Suitable for professional audiences.\n\nTONE 2: FRIENDLY\n- Conversational, approachable and warm.\n- Use natural language and suitable emojis.\n\nTONE 3: PERSUASIVE\n- Compelling hooks and engaging messaging.\n- Include suitable calls to action without making unsupported claims.\n\nTHE 7 CONTENT FORMATS:\n\n1. LinkedIn Post\n2. Instagram Caption\n3. Instagram Post Idea\n4. Instagram Reel Idea\n5. Instagram Reel Script\n6. Twitter/X Thread\n7. WhatsApp Message\n\nOUTPUT STRUCTURE:\n\nFor each content format, provide:\n- Professional Version\n- Friendly Version\n- Persuasive Version\n\nIMPORTANT RULES:\n- Generate all 21 variations.\n- Keep every version unique.\n- Preserve the original blog's facts and meaning.\n- Never invent statistics or information.\n- Use clear HTML formatting.\n- Use h2 for content format headings.\n- Use h3 for tone headings.\n- Use p, ul, li and strong tags appropriately.\n- Separate sections with hr tags.\n- Do not use Markdown formatting.\n- Return only valid HTML.\n- Do not wrap the response in code fences.\n\nBLOG CONTENT:\n${$json.blogContent}`\n}}\nFINAL QUALITY RULES:\n\n1. Generate exactly 3 tone versions for every content format.\n2. Keep all 21 variations complete.\n3. Keep the Twitter/X threads to exactly 5 posts per tone.\n4. Make each tone noticeably different in vocabulary and style.\n5. Avoid repeating identical hooks or sentences.\n6. Use proper HTML tags and close every opened tag.\n7. Maintain consistent spacing between all sections.\n8. Do not include unsupported facts or statistics.",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        672,
+        0
+      ],
+      "id": "0bccf9ca-73e7-4754-bb15-8acf8ac0eef9",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1.2,
+      "position": [
+        576,
+        224
+      ],
+      "id": "667d5f9f-4b5b-407a-ad5d-d76d5117c97d",
+      "name": "Google Gemini Chat Model"
+    },
+    {
+      "parameters": {
+        "sendTo": "YOUR_EMAIL_ADDRESS",
+        "subject": "=Your AI-Generated Social Media Content Pack",
+        "message": "={{ $json.output }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        1008,
+        0
+      ],
+      "id": "5fc9a0df-a340-47e4-aff5-7999cd63afe7",
+      "name": "Send a message"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "On form submission": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "HTML",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTML": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "timeSavedMode": "fixed",
+    "callerPolicy": "workflowsFromSameOwner",
+    "availableInMCP": false
+  },
+  "nodeGroups": [],
+  "tags": []
+}
