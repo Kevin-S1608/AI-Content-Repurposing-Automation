@@ -60,15 +60,21 @@ Blog URL Submission
 4. The AI Agent uses Google Gemini to create seven content formats in three tones.
 5. The generated HTML-formatted content is sent to the configured Gmail address.
 
-## Setup
+## Workflow Export
 
-1. Create an n8n account and open a new workflow.
-2. Import the workflow export if one is provided in this repository, or recreate the nodes following the workflow diagram above.
-3. Configure the form trigger, HTTP Request, HTML extraction, AI Agent, and Gmail nodes.
-4. Connect your own Google Gemini and Gmail credentials through n8n's credential manager.
-5. Activate or publish the workflow and submit a blog URL to test it.
+The sanitized n8n workflow JSON is available here:
 
-> **Note:** This repository documents the project. The n8n workflow export should be added separately after removing credentials, tokens, and other private information. Never commit API keys, access tokens, passwords, or personal credentials.
+**[Download the n8n workflow JSON](workflow/content-repurposing-workflow.json)**
+
+To use it:
+
+1. Download the JSON file.
+2. In n8n, import the workflow from the downloaded JSON file.
+3. Configure your own Google Gemini and Gmail credentials in the relevant nodes.
+4. Replace `YOUR_EMAIL_ADDRESS` in the Gmail node with your preferred recipient address.
+5. Review the workflow settings, test it with a blog URL, and activate it when ready.
+
+> **Security:** The shared export does not contain the original account credential references or personal recipient email. Never commit API keys, access tokens, passwords, OAuth secrets, or private webhook URLs.
 
 ## Scope and Limitations
 
@@ -85,8 +91,8 @@ Blog URL Submission
 
 ## Project Status
 
-**Version:** 1.0  
-**Status:** Core workflow implemented and successfully tested with Gmail delivery.
+**Version:** 1.1  
+**Status:** Core workflow implemented and successfully tested with Gmail delivery. Sanitized n8n workflow export included.
 
 ---
 
